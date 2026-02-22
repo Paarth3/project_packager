@@ -1,0 +1,2 @@
+- Created Gemini Key
+- Installed JQ
