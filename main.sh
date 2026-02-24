@@ -6,6 +6,18 @@ API_KEY=""
 MODEL="gemini-2.5-flash"
 API_URL="https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}"
 OUTPUT_FILE_PATH="output.json"
+IGNORE_FILE="./ppignore.txt"
+
+if ! command -v jq > /dev/null 2>&1; then
+  read -rp "'jq' not installed. Do you want to install it (Y/N): " user_install
+
+  if [ "$user_install" == "Y" ] || [ "$user_install" == "y" ]; then
+    sudo apt update && sudo apt install -y jq
+  else
+    echo "Abort!"
+    exit 3
+  fi
+fi
 
 PROMPT=$(jq -n \
   '{
@@ -37,8 +49,13 @@ if [ ! -s "$OUTPUT_FILE_PATH" ]; then
 fi
 
 for file_path in **/*; do
+
   if [ -f "$file_path" ]; then
-    if [ "$file_path" == "main.sh" ] || [ "$file_path" == "$OUTPUT_FILE_PATH" ] || [ "$file_path" == \.\.?.* ]; then
+    if grep -Fq $(echo "$file_path" | sed 's/^\.\///') "$IGNORE_FILE"; then
+      continue
+    fi
+
+    if [ "$file_path" == \.\.?.* ]; then
       continue
     fi
 
@@ -60,6 +77,6 @@ for file_path in **/*; do
     tmp=$(mktemp)
     jq --arg file_path "$file_path" --argjson response "$CLEAN_RESPONSE" '.[$file_path] = $response' "$OUTPUT_FILE_PATH" > "$tmp"
     mv "$tmp" "$OUTPUT_FILE_PATH"
-    echo "Done: ${file_path}"
+    echo "Done: $file_path"
   fi
 done
