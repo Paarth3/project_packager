@@ -6,7 +6,13 @@ API_KEY=""
 MODEL="gemini-2.5-flash"
 API_URL="https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}"
 OUTPUT_FILE_PATH="output.json"
-IGNORE_FILE="./ppignore.txt"
+IGNORE_FILE="
+------------DO NOT REMOVE THESE------------
+./README.md
+./main.sh
+./output.json
+-------------------------------------------
+"
 
 if ! command -v jq > /dev/null 2>&1; then
   read -rp "'jq' not installed. Do you want to install it (Y/N): " user_install
@@ -50,33 +56,37 @@ fi
 
 for file_path in **/*; do
 
-  if [ -f "$file_path" ]; then
-    if grep -Fq $(echo "$file_path" | sed 's/^\.\///') "$IGNORE_FILE"; then
-      continue
-    fi
-
-    if [ "$file_path" == \.\.?.* ]; then
-      continue
-    fi
-
-    PAYLOAD=$(jq -n \
-    --arg prompt "$PROMPT" \
-    --arg content "$(cat "$file_path")" \
-    '{
-      contents: [{
-        parts: [
-          { text: $prompt },
-          { text: $content }
-        ]}
-      ]
-    }')
-
-    RAW_RESPONSE="$(curl -s -X POST "$API_URL" -H 'Content-Type: application/json' -d "$PAYLOAD")"
-    CLEAN_RESPONSE=$(echo "$RAW_RESPONSE" | jq -r '.candidates[0].content.parts[0].text' | sed -n '/^{/,/^}/p')
-
-    tmp=$(mktemp)
-    jq --arg file_path "$file_path" --argjson response "$CLEAN_RESPONSE" '.[$file_path] = $response' "$OUTPUT_FILE_PATH" > "$tmp"
-    mv "$tmp" "$OUTPUT_FILE_PATH"
-    echo "Done: $file_path"
+  if [ ! -f "$file_path" ]; then
+    continue
   fi
+
+  if echo "$IGNORE_FILE" | grep -Fq ${file_path#./}; then
+    continue
+  elif [ "$1" == "-i" ] && [ "${file_path#./}" == "${2#./}" ]; then
+    continue
+  elif [ "$1" == "-i" ] && grep -Fq ${file_path#./} "$2"; then
+    continue
+  elif [ "$file_path" == \.\.?.* ]; then
+    continue
+  fi
+
+  PAYLOAD=$(jq -n \
+  --arg prompt "$PROMPT" \
+  --arg content "$(cat "$file_path")" \
+  '{
+    contents: [{
+      parts: [
+        { text: $prompt },
+        { text: $content }
+      ]}
+    ]
+  }')
+
+  RAW_RESPONSE="$(curl -s -X POST "$API_URL" -H 'Content-Type: application/json' -d "$PAYLOAD")"
+  CLEAN_RESPONSE=$(echo "$RAW_RESPONSE" | jq -r '.candidates[0].content.parts[0].text' | sed -n '/^{/,/^}/p')
+
+  tmp=$(mktemp)
+  jq --arg file_path "$file_path" --argjson response "$CLEAN_RESPONSE" '.[$file_path] = $response' "$OUTPUT_FILE_PATH" > "$tmp"
+  mv "$tmp" "$OUTPUT_FILE_PATH"
+  echo "Done: $file_path"
 done

@@ -1,1 +1,106 @@
-{}
+{
+  "dummy/calculator.py": {
+    "purpose": "This file implements a basic command-line calculator providing standard arithmetic operations (addition, subtraction, multiplication, division) through a user interactive loop.",
+    "key_entities": [
+      {
+        "name": "add",
+        "type": "Function",
+        "description": "Performs addition of two numbers.",
+        "usage_behavior": "Takes two numerical inputs (x, y) and returns their sum. Called by `main` based on user choice.",
+        "assumptions_context": "Inputs are expected to be numerical."
+      },
+      {
+        "name": "subtract",
+        "type": "Function",
+        "description": "Performs subtraction of two numbers.",
+        "usage_behavior": "Takes two numerical inputs (x, y) and returns their difference. Called by `main` based on user choice.",
+        "assumptions_context": "Inputs are expected to be numerical."
+      },
+      {
+        "name": "multiply",
+        "type": "Function",
+        "description": "Performs multiplication of two numbers.",
+        "usage_behavior": "Takes two numerical inputs (x, y) and returns their product. Called by `main` based on user choice.",
+        "assumptions_context": "Inputs are expected to be numerical."
+      },
+      {
+        "name": "divide",
+        "type": "Function",
+        "description": "Performs division of two numbers, including handling division by zero.",
+        "usage_behavior": "Takes two numerical inputs (x, y). If y is 0, it returns an error string; otherwise, it returns the quotient. Called by `main` based on user choice.",
+        "assumptions_context": "Inputs are expected to be numerical."
+      },
+      {
+        "name": "main",
+        "type": "Function",
+        "description": "Orchestrates the calculator's user interface, input handling, and operation execution.",
+        "usage_behavior": "Initiates a loop that prompts the user for an operation choice and two numbers. It calls the respective arithmetic functions, displays results, and handles invalid inputs (non-numeric, division by zero) or exit commands ('q').",
+        "assumptions_context": "Assumes standard console input/output for interaction. Users are expected to input numbers or specific command characters."
+      }
+    ],
+    "dependencies": [],
+    "side_effects": [
+      "Prints welcome messages, operation choices, input prompts, results, and error messages to standard output (console)."
+    ]
+  },
+  "dummy/funny.sh": {
+    "purpose": "This bash script simulates a sequence of 'cyber-infiltration' steps, printing messages to the console with timed delays, culminating in a humorous critical error and operation abort.",
+    "key_entities": [
+      {
+        "name": "Initiation Protocol",
+        "type": "Script Step",
+        "description": "Prints an initiation message to the console.",
+        "usage_behavior": "Executes sequentially at the start of the script, outputting 'Initiating cyber-infiltration protocol...' to stdout.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Mainframe Bypass Simulation",
+        "type": "Script Step",
+        "description": "Prints a message simulating bypassing a mainframe.",
+        "usage_behavior": "Executes after initiation, outputting 'Bypassing the central mainframe...' to stdout.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Firewall Decryption Simulation",
+        "type": "Script Step",
+        "description": "Prints a message simulating firewall decryption.",
+        "usage_behavior": "Executes after mainframe bypass, outputting 'Decrypting firewall...' to stdout.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Accessing User Files Simulation",
+        "type": "Script Step",
+        "description": "Prints a message indicating access to user files.",
+        "usage_behavior": "Executes after firewall decryption, outputting 'Accessing top-secret user files...' to stdout.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Placeholder Pause",
+        "type": "Script Step",
+        "description": "Prints an ellipses as a visual placeholder.",
+        "usage_behavior": "Executes after attempting to access user files, outputting '...' to stdout.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Critical Error Message",
+        "type": "Script Step",
+        "description": "Prints a humorous critical error message related to user browser history.",
+        "usage_behavior": "Executes after the placeholder pause, outputting 'CRITICAL ERROR: User's browser history is too embarrassing to process.' to stdout.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Aborting Operation",
+        "type": "Script Step",
+        "description": "Prints a final message indicating the operation is aborted.",
+        "usage_behavior": "Executes at the end of the script, outputting 'Aborting operation to protect system integrity. Goodbye.' to stdout.",
+        "assumptions_context": "None."
+      }
+    ],
+    "dependencies": [
+      "bash",
+      "echo",
+      "sleep"
+    ],
+    "side_effects": []
+  }
+}
