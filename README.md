@@ -1,16 +1,16 @@
-# Project Packager (PP)
+# Project Packager
 
-## Project Overview
+## Overview
 
-**Project Packager** is an automated Bash utility that traverses a multi-file codebase to generate a highly structured, file-by-file summary in JSON format, using the Google Gemini API.
+**Project Packager (PP)** is an automated Bash utility that traverses a multi-file codebase and leverages the Google Gemini API to generate a highly structured, file-by-file summary in JSON format.
 
-Navigating a new or undocumented project can be time-consuming. This tool solves that problem by automatically documenting the high-level architecture, including core responsibilities, key functions/classes, dependencies, and side effects, for every file. The resulting `output.json` file can be read by developers to quickly grasp a project's structure, or fed into AI coding assistants to effectively prime them with comprehensive project context.
+Navigating a new or undocumented project can be time-consuming. This tool solves that problem by automatically documenting the high-level architecture, including core responsibilities, key functions/classes, dependencies, assumptions, and side effects, for every file. The resulting `output.json` file can be read by developers to quickly grasp a project's structure, or fed into AI coding assistants to effectively prime them with comprehensive project context without exceeding prompt limits.
 
 ## Key Learnings
 
-- **REST API Integration & Authentication:** Configured and sent secure HTTP requests to the Google Gemini API using `curl`, managing payload structures and API keys.    
-- **Robust Data Handling with `jq`:** Learned to use `jq` not just for parsing API responses, but for safely building nested JSON output. This ensures that shell variables and raw code strings are properly escaped, avoiding injection vulnerabilities or syntax errors.
-- **Advanced Bash Scripting:** Utilized `globstar` for recursive file traversal, implemented command-line argument parsing (e.g., custom ignore lists via flags), and managed temporary files (`mktemp`) for safe, in-place file updates.
+- **REST API Integration & Authentication:** Configured and sent secure HTTP requests to the Google Gemini API using `curl`, managing payload structures and API keys.
+- **Defensive Bash Scripting:** Implemented robust CLI argument parsing using `while` and `shift` loops, managed script exit codes effectively, and added strict pre-flight checks to verify file existence and read permissions before processing.
+- **Robust Data Handling with `jq`:** Learned to use `jq` not just for parsing API responses, but for safely constructing nested JSON payloads. This ensures that shell variables and raw code strings are properly escaped, avoiding injection vulnerabilities or syntax errors.
 - **Prompt Engineering & Output Enforcement:** Designed dense system prompts to constrain a Generative AI model into returning strict, machine-readable JSON rather than conversational markdown, utilizing tools like `sed` as a fallback to strip out unwanted formatting artifacts.
 
 ## Technical Details
@@ -26,31 +26,33 @@ Navigating a new or undocumented project can be time-consuming. This tool solves
 ### Important Design Decisions
 
 - **File-by-File Processing:** Instead of dumping an entire repository into an LLM (which risks exceeding token limits or losing detail), this script processes files individually. It incrementally builds a master JSON object mapping file paths to their structural summaries.
-- **JSON Parsing:** LLMs occasionally wrap JSON in markdown blockquotes (` ```json `). The script anticipates this and uses `sed -n '/^{/,/^}/p'` to automatically extract only the valid JSON payload from the raw text response before writing to the output file.
-- **Custom Ignore Logic:** Automatically ignores hidden files (e.g., `.git/`), its own source code, and dynamically accepts a custom exclusion list via the CLI to skip dependencies like `node_modules` or `.env` files.
+- **Resilient JSON Parsing:** LLMs occasionally wrap JSON in markdown blockquotes (` ```json `). The script anticipates this and uses `sed -n '/^{/,/^}/p'` to dynamically extract only the valid JSON payload from the raw text response before writing to the output file.
+- **Strict CLI & Error Handling:** The script features explicit command-line validation. It actively guards against invalid arguments, missing file paths, and unreadable files, throwing descriptive standard error (`stderr`) messages rather than failing silently mid-execution.
+- **Custom Ignore Logic:** Automatically ignores the tool's own source files and dynamically accepts a custom exclusion list via the `-i` CLI flag to skip dependencies like `node_modules` or `.env` files.
 
 ## How to Run / Use the Project
 
 ### Prerequisites
 
 1. A Linux/Unix environment (or WSL on Windows).
-2. A valid **Google Gemini API Key**. You can create one [here.](https://aistudio.google.com/api-keys)
+2. A valid **Google Gemini API Key** (with enough API credits). You can get one for free at [Google Gemini API](https://aistudio.google.com/api-keys)
 
 ### Setup
 
-1. You will simply need the `main.sh` file from this repository. Download it.
-2. Open the script file (`main.sh`) and insert your API key into the `API_KEY` variable at the top of the file:
-``` bash
+1. Download the `main.sh` file from this repository.
+2. Open the `main.sh` and insert your API key into the `API_KEY` variable at the top of the file:   
+```bash
 API_KEY="your_api_key_here"
 ```
-3. Make the script executable:
+3. Place the `main.sh` file into your project's root folder.
+4. Make the script executable by running the following command into your terminal. Ensure you provide the correct file path for `main.sh`.
 ```bash
 chmod +x main.sh
 ```
+
 ### Usage
 
-Make sure you are not out of API credits/usage. Run the script in the root directory of the project you want to summarize.
-
+Run the script in the root directory of the project you want to summarize.
 **Basic Run:**
 ```bash
 ./main.sh
@@ -61,17 +63,22 @@ _Note: If `jq` is not installed on your system, the script will automatically pr
 **Using a Custom Ignore File:** If you want to ignore specific files or directories, you can pass a text file containing the paths to ignore using the `-i` flag:
 
 ```bash
-./main.sh -i myignorefile.txt
+./main.sh -i .myignorefile
 ```
+
+**Error Handling:** The script will safely abort and provide an error message if:
+- You provide an unrecognized argument.
+- You use the `-i` flag without providing a file path.
+- The specified ignore file does not exist or lacks read permissions.
 
 ### Output
 
-The script will process your files and generate an `output.json` file in the root directory. This file will contain a structured map of your project, formatted like this:
+The script will process your readable files and generate an `output.json` file in the root directory. This file will contain a structured map of your project, formatted like shown below. You may read the `output.json` sample provided in repository.
 
 ```json
 {
   "./src/app.py": {
-    "purpose": "Initialises the main web server and routing.",
+    "purpose": "Initializes the main web server and routing.",
     "key_entities": [...],
     "dependencies": [...],
     "side_effects": [...]
