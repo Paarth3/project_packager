@@ -1,5 +1,3 @@
-# ⚠️ Project still in development.
-
 # Project Packager (PP)
 
 ## Project Overview
