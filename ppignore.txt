@@ -1,1 +1,1 @@
-./dummy/hello_world.c
+./dummy/funny.sh

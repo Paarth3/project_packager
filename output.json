@@ -1,105 +1,210 @@
 {
   "dummy/calculator.py": {
-    "purpose": "This file implements a basic command-line calculator providing standard arithmetic operations (addition, subtraction, multiplication, division) through a user interactive loop.",
+    "purpose": "This file implements a simple command-line calculator application, providing basic arithmetic operations (addition, subtraction, multiplication, division) through user interaction.",
     "key_entities": [
       {
         "name": "add",
         "type": "Function",
         "description": "Performs addition of two numbers.",
-        "usage_behavior": "Takes two numerical inputs (x, y) and returns their sum. Called by `main` based on user choice.",
-        "assumptions_context": "Inputs are expected to be numerical."
+        "usage_behavior": "Takes two numerical arguments (x, y) and returns their sum.",
+        "assumptions_context": "None. Assumes numerical inputs."
       },
       {
         "name": "subtract",
         "type": "Function",
         "description": "Performs subtraction of two numbers.",
-        "usage_behavior": "Takes two numerical inputs (x, y) and returns their difference. Called by `main` based on user choice.",
-        "assumptions_context": "Inputs are expected to be numerical."
+        "usage_behavior": "Takes two numerical arguments (x, y) and returns their difference (x - y).",
+        "assumptions_context": "None. Assumes numerical inputs."
       },
       {
         "name": "multiply",
         "type": "Function",
         "description": "Performs multiplication of two numbers.",
-        "usage_behavior": "Takes two numerical inputs (x, y) and returns their product. Called by `main` based on user choice.",
-        "assumptions_context": "Inputs are expected to be numerical."
+        "usage_behavior": "Takes two numerical arguments (x, y) and returns their product.",
+        "assumptions_context": "None. Assumes numerical inputs."
       },
       {
         "name": "divide",
         "type": "Function",
-        "description": "Performs division of two numbers, including handling division by zero.",
-        "usage_behavior": "Takes two numerical inputs (x, y). If y is 0, it returns an error string; otherwise, it returns the quotient. Called by `main` based on user choice.",
-        "assumptions_context": "Inputs are expected to be numerical."
+        "description": "Performs division of two numbers, including handling for division by zero.",
+        "usage_behavior": "Takes two numerical arguments (x, y). If y is 0, returns an 'Error!' string; otherwise, returns the quotient (x / y).",
+        "assumptions_context": "None. Assumes numerical inputs."
       },
       {
         "name": "main",
-        "type": "Function",
-        "description": "Orchestrates the calculator's user interface, input handling, and operation execution.",
-        "usage_behavior": "Initiates a loop that prompts the user for an operation choice and two numbers. It calls the respective arithmetic functions, displays results, and handles invalid inputs (non-numeric, division by zero) or exit commands ('q').",
-        "assumptions_context": "Assumes standard console input/output for interaction. Users are expected to input numbers or specific command characters."
+        "type": "Function (Script Entry Point)",
+        "description": "Serves as the main loop for the calculator, managing user input, operation selection, error handling for non-numeric input, and displaying results.",
+        "usage_behavior": "Executes when the script is run directly. Presents a menu, prompts for user choices (operation, numbers), calls the respective arithmetic functions, and prints the result. Continues until the user chooses to quit ('q'). Handles `ValueError` for non-numeric input.",
+        "assumptions_context": "None."
       }
     ],
     "dependencies": [],
     "side_effects": [
-      "Prints welcome messages, operation choices, input prompts, results, and error messages to standard output (console)."
+      "Prints messages and calculation results to standard output (console)."
     ]
   },
-  "dummy/funny.sh": {
-    "purpose": "This bash script simulates a sequence of 'cyber-infiltration' steps, printing messages to the console with timed delays, culminating in a humorous critical error and operation abort.",
+  "dummy/hello_world.c": {
+    "purpose": "This C source file implements a basic program that prints a 'Hello World!' message to the console upon execution.",
     "key_entities": [
       {
-        "name": "Initiation Protocol",
-        "type": "Script Step",
-        "description": "Prints an initiation message to the console.",
-        "usage_behavior": "Executes sequentially at the start of the script, outputting 'Initiating cyber-infiltration protocol...' to stdout.",
-        "assumptions_context": "None."
-      },
-      {
-        "name": "Mainframe Bypass Simulation",
-        "type": "Script Step",
-        "description": "Prints a message simulating bypassing a mainframe.",
-        "usage_behavior": "Executes after initiation, outputting 'Bypassing the central mainframe...' to stdout.",
-        "assumptions_context": "None."
-      },
-      {
-        "name": "Firewall Decryption Simulation",
-        "type": "Script Step",
-        "description": "Prints a message simulating firewall decryption.",
-        "usage_behavior": "Executes after mainframe bypass, outputting 'Decrypting firewall...' to stdout.",
-        "assumptions_context": "None."
-      },
-      {
-        "name": "Accessing User Files Simulation",
-        "type": "Script Step",
-        "description": "Prints a message indicating access to user files.",
-        "usage_behavior": "Executes after firewall decryption, outputting 'Accessing top-secret user files...' to stdout.",
-        "assumptions_context": "None."
-      },
-      {
-        "name": "Placeholder Pause",
-        "type": "Script Step",
-        "description": "Prints an ellipses as a visual placeholder.",
-        "usage_behavior": "Executes after attempting to access user files, outputting '...' to stdout.",
-        "assumptions_context": "None."
-      },
-      {
-        "name": "Critical Error Message",
-        "type": "Script Step",
-        "description": "Prints a humorous critical error message related to user browser history.",
-        "usage_behavior": "Executes after the placeholder pause, outputting 'CRITICAL ERROR: User's browser history is too embarrassing to process.' to stdout.",
-        "assumptions_context": "None."
-      },
-      {
-        "name": "Aborting Operation",
-        "type": "Script Step",
-        "description": "Prints a final message indicating the operation is aborted.",
-        "usage_behavior": "Executes at the end of the script, outputting 'Aborting operation to protect system integrity. Goodbye.' to stdout.",
+        "name": "main",
+        "type": "Function",
+        "description": "The primary entry point for the C program execution.",
+        "usage_behavior": "When the program is run, this function is automatically invoked. It calls the `printf` function to output a string to standard output and then returns an integer value (0 for success).",
         "assumptions_context": "None."
       }
     ],
     "dependencies": [
+      "stdio.h"
+    ],
+    "side_effects": [
+      "Prints the string \"Hello World!\" to standard output (console)."
+    ]
+  },
+  "runSuite.sh": {
+    "purpose": "This script acts as a test runner, executing a specified program against a suite of test cases defined in a file, comparing its output with expected results.",
+    "key_entities": [
+      {
+        "name": "Argument Validation",
+        "type": "Script Step",
+        "description": "Ensures exactly two command-line arguments (suite file and program path) are provided before proceeding.",
+        "usage_behavior": "Checks `$#` and exits with an error code (1) and message to stderr if the argument count is incorrect.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "Test Suite Iteration",
+        "type": "Script Step",
+        "description": "Reads each line from the provided suite file, treating each line as a test suite identifier.",
+        "usage_behavior": "Uses `cat` to read the `suite_file` and iterates over its lines using a `for` loop.",
+        "assumptions_context": "The `suite_file` must exist and contain one test suite name per line."
+      },
+      {
+        "name": "Expected Output File Check",
+        "type": "Script Step",
+        "description": "Verifies that the `.expect` file corresponding to the current test suite exists and is readable.",
+        "usage_behavior": "Uses `[ ! -r \"${suite}.expect\" ]` to check readability. Exits with error if not found or unreadable.",
+        "assumptions_context": "For each `suite`, a corresponding `${suite}.expect` file must exist and be readable, containing the expected output for that test case."
+      },
+      {
+        "name": "Test Execution Environment Setup",
+        "type": "Script Step",
+        "description": "Creates a temporary file to capture the program's output and loads any specific arguments for the current test suite.",
+        "usage_behavior": "Calls `mktemp` to create a unique temporary file path. Checks for `${suite}.args` and loads its content into the `args` variable if present.",
+        "assumptions_context": "The `mktemp` utility must be available. Optional `${suite}.args` files can exist, containing space-separated arguments for the program."
+      },
+      {
+        "name": "Program Execution",
+        "type": "Script Step",
+        "description": "Executes the target program (`program`) with specific arguments and input for the current test suite, redirecting its output.",
+        "usage_behavior": "If `${suite}.in` exists, its content is piped to the program's stdin, and stdout is redirected to `TEMPFILE`. Otherwise, the program runs directly, and stdout goes to `TEMPFILE`.",
+        "assumptions_context": "The `program` must be an executable. Optional `${suite}.in` files can exist, containing stdin for the program."
+      },
+      {
+        "name": "Output Comparison and Reporting",
+        "type": "Script Step",
+        "description": "Compares the program's actual output (in `TEMPFILE`) with the expected output (in `${suite}.expect`) and reports failures.",
+        "usage_behavior": "Uses `diff` to compare the two files. If `diff` exits with a non-zero status, it prints a 'Test failed' message along with arguments, input, expected, and actual outputs.",
+        "assumptions_context": "The `diff` utility must be available. Output comparison is strict."
+      },
+      {
+        "name": "Temporary File Cleanup",
+        "type": "Script Step",
+        "description": "Removes the temporary file created for capturing program output.",
+        "usage_behavior": "Executes `rm ${TEMPFILE}` after each test suite is processed, regardless of test outcome.",
+        "assumptions_context": "The `rm` utility must be available."
+      }
+    ],
+    "dependencies": [
       "bash",
-      "echo",
-      "sleep"
+      "cat",
+      "mktemp",
+      "diff",
+      "rm"
+    ],
+    "side_effects": [
+      "Creates temporary files in the file system for program output.",
+      "Deletes temporary files.",
+      "Executes an external program (`program`).",
+      "Prints error messages to stderr.",
+      "Prints test failure reports (including program args, input, expected, and actual output) to stdout."
+    ]
+  },
+  "dummy/doudizhu.rkt": {
+    "purpose": "This Racket file implements utility functions for managing playing cards, specifically for a Doudizhu-like game. It defines a card data type and provides functions for card value comparison, sorting, finding cards by occurrence count, and removing cards from a hand.",
+    "key_entities": [
+      {
+        "name": "Card",
+        "type": "Data Definition",
+        "description": "Represents a playing card, including standard ranks (3-2, A, K, Q, J) and two joker cards ('Black', 'Red').",
+        "usage_behavior": "Can be an integer (3-10, 2), or a symbol ('Jack', 'Queen', 'King', 'Ace', 'Black', 'Red').",
+        "assumptions_context": "The value '2' is the highest numeric card, and 'Black'/'Red' jokers are highest overall."
+      },
+      {
+        "name": "card-value",
+        "type": "Function",
+        "description": "Converts a Card into a numerical value representing its relative strength for comparison purposes.",
+        "usage_behavior": "Input: `c` (Card). Output: Natural number (3-17) where higher numbers mean stronger cards (e.g., 2=15, Black=16, Red=17).",
+        "assumptions_context": "Assumes `c` is a valid `Card` data type."
+      },
+      {
+        "name": "card<=?",
+        "type": "Function",
+        "description": "Compares two cards to determine if the first card's value is less than or equal to the second card's value.",
+        "usage_behavior": "Input: `c1` (Card), `c2` (Card). Output: Boolean. Uses `card-value` for comparison.",
+        "assumptions_context": "Assumes `c1` and `c2` are valid `Card` data types."
+      },
+      {
+        "name": "card=?",
+        "type": "Function",
+        "description": "Compares two cards to determine if they have the same value.",
+        "usage_behavior": "Input: `c1` (Card), `c2` (Card). Output: Boolean. Uses `card-value` for comparison.",
+        "assumptions_context": "Assumes `c1` and `c2` are valid `Card` data types."
+      },
+      {
+        "name": "insert-card",
+        "type": "Function (Helper)",
+        "description": "Inserts a single card into an already sorted list of cards while maintaining sorted order.",
+        "usage_behavior": "Input: `c` (Card), `loc` (listof Card, assumed sorted). Output: (listof Card). Uses `card<=?` for comparison.",
+        "assumptions_context": "The input list `loc` is assumed to be sorted according to `card<=?`."
+      },
+      {
+        "name": "sort-cards",
+        "type": "Function",
+        "description": "Sorts a given list of cards by their value in ascending order.",
+        "usage_behavior": "Input: `loc` (listof Card). Output: (listof Card), sorted. Implements an insertion sort using `insert-card`.",
+        "assumptions_context": "None."
+      },
+      {
+        "name": "count-occurrences",
+        "type": "Function (Helper)",
+        "description": "Counts the number of continuous occurrences of a specific card at the beginning of a hand.",
+        "usage_behavior": "Input: `c` (Card), `hand` (Hand, expected to be sorted). Output: Natural number. Stops counting when a different card is encountered or the list ends.",
+        "assumptions_context": "The `hand` list is assumed to be sorted and `c` is expected to be the first card in `hand` for meaningful continuous counting."
+      },
+      {
+        "name": "remove-all-cards",
+        "type": "Function (Helper)",
+        "description": "Removes all continuous instances of a specific card from the beginning of a hand.",
+        "usage_behavior": "Input: `c` (Card), `hand` (Hand, expected to be sorted). Output: Hand (remaining cards after removal).",
+        "assumptions_context": "The `hand` list is assumed to be sorted."
+      },
+      {
+        "name": "find-kind",
+        "type": "Function",
+        "description": "Identifies and returns a sorted list of unique card values that appear at least `n` times in a given hand.",
+        "usage_behavior": "Input: `n` (Nat, >= 1), `hand` (Hand, expected to be sorted). Output: (listof Card), sorted, containing unique card values. Uses `count-occurrences` and `remove-all-cards`.",
+        "assumptions_context": "The input `hand` is assumed to be sorted. `n` must be a natural number greater than or equal to 1."
+      },
+      {
+        "name": "remove-cards",
+        "type": "Function",
+        "description": "Removes all cards present in the first hand (`h1`) from the second hand (`h2`).",
+        "usage_behavior": "Input: `h1` (Hand), `h2` (Hand). Output: Hand. Both input hands are assumed to be sorted. It performs a set-like removal, matching cards by value.",
+        "assumptions_context": "Both input hands (`h1` and `h2`) must be sorted for this function to operate correctly and efficiently. Cards are removed by matching value, not by position."
+      }
+    ],
+    "dependencies": [
+      "htdp-beginner-abbr-reader.ss (Racket language level configuration)"
     ],
     "side_effects": []
   }
