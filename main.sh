@@ -72,7 +72,7 @@ while [ $# -ne  0 ]; do
 	fi
 done
 
-if [ ! -f "$IGNORE_FILE_PATH" ] || [ ! -r "$IGNORE_FILE_PATH" ]; then
+if [ -n "$IGNORE_FILE_PATH" ] && ([ ! -f "$IGNORE_FILE_PATH" ] || [ ! -r "$IGNORE_FILE_PATH" ]); then
 	echo "ERROR: The file containing information about other files to ignore either does not exists on the specified path or is not readable." >&2
 	exit 1
 fi
