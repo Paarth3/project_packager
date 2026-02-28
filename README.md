@@ -27,7 +27,7 @@ Navigating a new or undocumented project can be time-consuming. This tool solves
 
 - **File-by-File Processing:** Instead of dumping an entire repository into an LLM (which risks exceeding token limits or losing detail), this script processes files individually. It incrementally builds a master JSON object mapping file paths to their structural summaries.
 - **Resilient JSON Parsing:** LLMs occasionally wrap JSON in markdown blockquotes (` ```json `). The script anticipates this and uses `sed -n '/^{/,/^}/p'` to dynamically extract only the valid JSON payload from the raw text response before writing to the output file.
-- **Strict CLI & Error Handling:** The script features explicit command-line validation. It actively guards against invalid arguments, missing file paths, and unreadable files, throwing descriptive standard error (`stderr`) messages rather than failing silently mid-execution.
+- **Strict CLI & Error Handling:** The script features explicit command-line validation. It actively guards against invalid arguments, missing file paths, and unreadable files, throwing descriptive standard error (`stderr`) messages rather than failing mid-execution silently.
 - **Custom Ignore Logic:** Automatically ignores the tool's own source files and dynamically accepts a custom exclusion list via the `-i` CLI flag to skip dependencies like `node_modules` or `.env` files.
 
 ## How to Run / Use the Project
@@ -45,14 +45,14 @@ Navigating a new or undocumented project can be time-consuming. This tool solves
 API_KEY="your_api_key_here"
 ```
 3. Place the `main.sh` file into your project's root folder.
-4. Make the script executable by running the following command into your terminal. Ensure you provide the correct file path for `main.sh`.
+4. Make the script executable by running the following command in your terminal. Ensure you provide the correct file path for `main.sh`.
 ```bash
 chmod +x main.sh
 ```
 
 ### Usage
 
-Run the script in the root directory of the project you want to summarize.
+Run the script in the root directory of the project you want to summarise.
 **Basic Run:**
 ```bash
 ./main.sh
@@ -67,18 +67,21 @@ _Note: If `jq` is not installed on your system, the script will automatically pr
 ```
 
 **Error Handling:** The script will safely abort and provide an error message if:
-- You provide an unrecognized argument.
+- You provide an unrecognised argument.
 - You use the `-i` flag without providing a file path.
 - The specified ignore file does not exist or lacks read permissions.
 
 ### Output
 
-The script will process your readable files and generate an `output.json` file in the root directory. This file will contain a structured map of your project, formatted like shown below. You may read the `output.json` sample provided in repository.
+The script will process your readable files and generate an `output.json` file in the root directory. This file will contain a structured map of your project, formatted as shown below. You may read the `output.json` sample provided in the repository.
+
+#### ⚠️ Note
+If you see the value for a certain file(s) as `null`, there is a high chance you ran out of Gemini API credits for the day. The API credits should reset the next day.
 
 ```json
 {
   "./src/app.py": {
-    "purpose": "Initializes the main web server and routing.",
+    "purpose": "Initialises the main web server and routing.",
     "key_entities": [...],
     "dependencies": [...],
     "side_effects": [...]
