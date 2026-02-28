@@ -1,4 +1,4 @@
-# Project Packager
+# Project Packager (PP)
 
 ## Overview
 
