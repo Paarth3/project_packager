@@ -1,5 +1,13 @@
 #!/bin/bash
 
+if [ ${BASH_VERSINFO:-0} -le 4 ]; then
+	echo "ERROR: This script requires Bash version 4.0 or higher to use globstar." >&2
+	exit 1
+elif [ "${OSTYPE}" != "linux-gnu" ]; then
+	echo "ERROR: This script is currently only supported on Linux (GNU) operating systems." >&2
+	exit 1
+fi
+
 shopt -s globstar
 
 API_KEY=""
@@ -8,19 +16,22 @@ API_URL="https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:genera
 OUTPUT_FILE_PATH="output.json"
 DEFAULT_IGNORES="
 ./README.md
-./main.sh
-./output.json
 "
 IGNORE_FILE_PATH=""
 
 if ! command -v jq > /dev/null 2>&1; then
 	read -rp "'jq' not installed. Do you want to install it (Y/N): " user_install
 
-	if [ "$user_install" == "Y" ] || [ "$user_install" == "y" ]; then
-		(sudo apt update && sudo apt install -y jq) || exit $?
+	if [[ "$user_install" =~ ^([Yy]|YES|yes|Yes)$ ]]; then
+		if command -v apt > /dev/null 2>&1; then
+			(sudo apt update && sudo apt install -y jq) || exit $?
+		else
+			echo "ERROR: 'apt' package manager not found. Please install 'jq' manually." >&2
+			exit 1 No such file or directory
+		fi
 	else
 		echo "Abort!"
-		exit 3
+		exit 1
 	fi
 fi
 
@@ -49,15 +60,23 @@ PROMPT=$(jq -n \
 		}
 	}')
 
+if [ "$(readlink -f "$(pwd)")" != "$(dirname "$(readlink -f "$0")")" ]; then
+	echo "ERROR: Must be run from the script's own directory." >&2
+	exit 1
+fi
+
 if [ ! -s "$OUTPUT_FILE_PATH" ]; then
 	jq -n '{ }' > "$OUTPUT_FILE_PATH"
+elif ! jq empty "$OUTPUT_FILE_PATH" > /dev/null 2>&1; then
+	echo "ERROR: Existing $OUTPUT_FILE_PATH contains invalid JSON. Please fix or delete the entire file." >&2
+    exit 1
 fi
 
 while [ $# -ne  0 ]; do
 	if [ "$1" == "-i" ]; then
 		shift
 		if [ $# -eq 0 ]; then
-			echo "ERROR: -i flag must be followed by an argument specifying the file path of the file containing information about files to ignore." >&2
+			echo "ERROR: -i requires a file path argument." >&2
 			exit 1
 		else
 			IGNORE_FILE_PATH="$1"
@@ -67,13 +86,13 @@ while [ $# -ne  0 ]; do
 	fi
 
 	if [ $# -ne 0 ]; then
-		echo "ERROR: Invalid arguments provided." >&2
+		echo "ERROR: Unknown argument: ${1}" >&2
 		exit 1
 	fi
 done
 
 if [ -n "$IGNORE_FILE_PATH" ] && ([ ! -f "$IGNORE_FILE_PATH" ] || [ ! -r "$IGNORE_FILE_PATH" ]); then
-	echo "ERROR: The file containing information about other files to ignore either does not exists on the specified path or is not readable." >&2
+	echo "ERROR: Ignore file not found or not readable: $IGNORE_FILE_PATH" >&2
 	exit 1
 fi
 
@@ -81,15 +100,17 @@ for file_path in **/*; do
 
 	if [ ! -f "$file_path" ] || [ ! -r "$file_path" ]; then
 		continue
-	fi
-
-	if echo "$DEFAULT_IGNORES" | grep -Fq "${file_path#./}"; then
+	elif echo "$DEFAULT_IGNORES" | grep -Fq "${file_path#./}"; then
 		continue
 	elif [ "${file_path#./}" == "${IGNORE_FILE_PATH#./}" ]; then
 		continue
-	elif grep -Fq "${file_path#./}" "$IGNORE_FILE_PATH"; then
+	elif [ "${file_path#./}" == "${0#./}" ]; then
 		continue
-	elif [ "$file_path" == \.\.?.* ]; then
+	elif [ "${file_path#./}" == "${OUTPUT_FILE_PATH#./}" ]; then
+		continue
+	elif [ -f "$IGNORE_FILE_PATH" ] && grep -Fq "${file_path#./}" "$IGNORE_FILE_PATH"; then
+		continue
+	elif [[ "$file_path" == \..* ]]; then
 		continue
 	fi
 
@@ -105,11 +126,19 @@ for file_path in **/*; do
 		]
 	}')
 
-	RAW_RESPONSE="$(curl -s -X POST "$API_URL" -H 'Content-Type: application/json' -d "$PAYLOAD")"
+	RAW_RESPONSE="$(curl -sf -X POST "$API_URL" -H 'Content-Type: application/json' -d "$PAYLOAD")"
+	if [ $? -ne 0 ] || ! echo "$RAW_RESPONSE" | jq empty > /dev/null 2>&1 ; then
+    	echo "ERROR: API request failed for ${file_path} --- Skipping." >&2
+    	continue
+	fi
 	CLEAN_RESPONSE=$(echo "$RAW_RESPONSE" | jq -r '.candidates[0].content.parts[0].text' | sed -n '/^{/,/^}/p')
 
 	tmp=$(mktemp)
-	jq --arg file_path "$file_path" --argjson response "$CLEAN_RESPONSE" '.[$file_path] = $response' "$OUTPUT_FILE_PATH" > "$tmp"
-	mv "$tmp" "$OUTPUT_FILE_PATH"
-	echo "Done: $file_path"
+	if jq --arg file_path "$file_path" --argjson response "$CLEAN_RESPONSE" '.[$file_path] = $response' "$OUTPUT_FILE_PATH" > "$tmp"; then
+    	mv "$tmp" "$OUTPUT_FILE_PATH"
+    	echo "Done: $file_path"
+	else
+		echo "ERROR: AI generated invalid JSON for ${file_path} --- Skipping." >&2
+    	rm "$tmp"
+	fi
 done
