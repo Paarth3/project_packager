@@ -9,7 +9,7 @@ Navigating a new or undocumented project can be time-consuming. This tool solves
 ## Key Learnings
 
 - **REST API Integration & Authentication:** Configured and sent secure HTTP requests to the Google Gemini API using `curl`, managing payload structures and API keys.
-- **Defensive Bash Scripting:** Implemented robust CLI argument parsing using `while` and `shift` loops, managed script exit codes effectively, and added strict pre-flight checks to verify file existence and read permissions before processing.
+- **Defensive Bash Scripting & Environment Validation:** Implemented strict pre-flight checks to ensure the script only runs in compatible environments (enforcing Linux/GNU and Bash 4.0+ for globstar support), effectively preventing runtime errors before they occur.
 - **Robust Data Handling with `jq`:** Learned to use `jq` not just for parsing API responses, but for safely constructing nested JSON payloads. This ensures that shell variables and raw code strings are properly escaped, avoiding injection vulnerabilities or syntax errors.
 - **Prompt Engineering & Output Enforcement:** Designed dense system prompts to constrain a Generative AI model into returning strict, machine-readable JSON rather than conversational markdown, utilizing tools like `sed` as a fallback to strip out unwanted formatting artifacts.
 
@@ -21,7 +21,7 @@ Navigating a new or undocumented project can be time-consuming. This tool solves
 	- `curl` (Network requests)
     - `jq` (JSON construction, parsing, and modification)
     - `sed` / `grep` (Text processing and pattern matching)
-- **Environment:** Linux / Unix environments (The script includes automatic dependency resolution for Debian/Ubuntu systems via `apt`).
+- **Environment:** Strictly Linux (GNU) environments running Bash 4.0 or higher. The script includes automatic dependency resolution for Debian/Ubuntu systems via apt.
 
 ### Important Design Decisions
 
@@ -34,8 +34,9 @@ Navigating a new or undocumented project can be time-consuming. This tool solves
 
 ### Prerequisites
 
-1. A Linux/Unix environment (or WSL on Windows).
-2. A valid **Google Gemini API Key** (with enough API credits). You can get one for free at [Google Gemini API](https://aistudio.google.com/api-keys)
+1. A Linux (GNU) environment (e.g., Ubuntu, Debian, or WSL on Windows).
+2. Bash version 4.0 or higher (required for globstar directory traversal).
+3. A valid **Google Gemini API Key** (with enough API credits). You can get one for free at [Google Gemini API](https://aistudio.google.com/api-keys)
 
 ### Setup
 
@@ -67,6 +68,7 @@ _Note: If `jq` is not installed on your system, the script will automatically pr
 ```
 
 **Error Handling:** The script will safely abort and provide an error message if:
+- You are running an incompatible OS (non-Linux) or an older version of Bash (pre-4.0).
 - You provide an unrecognised argument.
 - You use the `-i` flag without providing a file path.
 - The specified ignore file does not exist or lacks read permissions.
@@ -74,9 +76,6 @@ _Note: If `jq` is not installed on your system, the script will automatically pr
 ### Output
 
 The script will process your readable files and generate an `output.json` file in the root directory. This file will contain a structured map of your project, formatted as shown below. You may read the `output.json` sample provided in the repository.
-
-#### ⚠️ Note
-If you see the value for a certain file(s) as `null`, there is a high chance you ran out of Gemini API credits for the day. The API credits should reset the next day.
 
 ```json
 {
